@@ -1,4 +1,5 @@
 from .user import User
-from .students import Students
+from .student import Student
+import schemas
 
-__all__ = ['User', 'Students']
+__all__ = ['User', 'Student', 'schemas']

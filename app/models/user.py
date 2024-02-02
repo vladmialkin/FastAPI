@@ -1,11 +1,11 @@
 from core import *
 
 
-class User(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    age: int
+class User(Base):
+    user_id = Column(Integer, primary_key=True, autoincrement=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
 
     def check_adult(self):
         adult = {self.age >= 18}
