@@ -3,8 +3,8 @@ from typing import Union
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
-from .database import database
-from .models import User, Students
+from database import data
+from .models import User, Student
 
 app = FastAPI()
 
@@ -43,8 +43,8 @@ async def create_user():
     return user.check_adult()
 
 
-@app.post("/students/", response_model=Students)
-async def create_students(student: Students):
+@app.post("/students/", response_model=Student)
+async def create_students(student: Student):
     query = """INSERT INTO students(first_name, last_name, date_of_birth, email, phone_number, enrollment_date, major)
                 VALUES(:first_name, :last_name, :date_of_birth, :email, :phone_number, :enrollment_date, :major)
                 RETURNING id, first_name, last_name
@@ -57,7 +57,8 @@ async def create_students(student: Students):
               "enrollment_date": student.enrollment_date,
               "major": student.major}
     try:
-        student_id = await database.execute(query=query, values=values)
+        # student_id = await database.execute(query=query, values=values)
+
         return {**student.dict(), "id": student_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to create student")
