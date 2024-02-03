@@ -19,3 +19,5 @@ class Student(BaseModel):
     enrollment_date: datetime | None
     major: str
 
+    class Config:
+        orm_mode = True
