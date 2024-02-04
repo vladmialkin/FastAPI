@@ -31,8 +31,8 @@ def upgrade() -> None:
     sa.Column('major', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('student_id')
     )
-    op.drop_index('date_of_birth_index', table_name='student')
-    op.drop_index('student_index', table_name='student')
+    # op.drop_index('date_of_birth_index', table_name='student')
+    # op.drop_index('student_index', table_name='student')
     op.drop_table('student')
     # ### end Alembic commands ###
 
@@ -50,7 +50,7 @@ def downgrade() -> None:
     sa.Column('major', sa.VARCHAR(length=30), autoincrement=False, nullable=True),
     sa.PrimaryKeyConstraint('student_id', name='student_pkey')
     )
-    op.create_index('student_index', 'student', ['student_id'], unique=False)
-    op.create_index('date_of_birth_index', 'student', ['date_of_birth'], unique=False)
+    # op.create_index('student_index', 'student', ['student_id'], unique=False)
+    # op.create_index('date_of_birth_index', 'student', ['date_of_birth'], unique=False)
     op.drop_table('students')
     # ### end Alembic commands ###
