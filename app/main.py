@@ -1,31 +1,16 @@
-from fastapi import FastAPI, HTTPException, Depends
-from database import engine, SessionLocal
-from sqlalchemy.orm import Session
-from models import Base
-import crud
-import schemas
+import uvicorn
+from fastapi import FastAPI
+from fastapi.routing import APIRouter
+# from api.handlers import user_route
 
-Base.metadata.create_all(bind=engine)
+#  Создание экземпляра приложения
 
-app = FastAPI()
+app = FastAPI(title="Мой проект")
 
+main_api_router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# main_api_router.include_router(user_router, prefix='/user', tags=['user'])
+app.include_router(main_api_router)
 
-
-@app.post("/students", response_model=schemas.Student)
-def create_students(student: schemas.Student, db: Session = Depends(get_db)):
-    db_student = crud.get_student(db, student_id=student.student_id)
-    if db_student:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_student(db=db, student=student)
-
-
-@app.get("/students")
-def get_students(db: Session = Depends(get_db)):
-    return crud.get_students(db=db)
+if __name__ == '__main__':
+    uvicorn.run("main:app", host='127.0.0.2', port=8000, reload=True)
