@@ -10,5 +10,6 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
 
+    products = relationship("Product", back_populates='category')
     shops = relationship("Shop", secondary=shop_category_association, back_populates='categories')
-    product = relationship("Product", back_populates='category')
+
