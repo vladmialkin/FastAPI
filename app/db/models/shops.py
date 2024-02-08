@@ -1,5 +1,5 @@
-from base import Base
-from shop_category_association import ShopCategoryAssociation
+from .base import Base
+from .shop_category_association import ShopCategoryAssociation
 from sqlalchemy import Column, Boolean, String, Integer, DateTime, func, Text, Float
 from sqlalchemy.orm import relationship
 

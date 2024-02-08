@@ -1,11 +1,11 @@
-from base import Base
-from shop_category_association import ShopCategoryAssociation
+from .base import Base
+from .shop_category_association import ShopCategoryAssociation
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
 
 class Category(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)

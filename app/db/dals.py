@@ -1,7 +1,7 @@
 from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.users import User
+from app.db.models.users import User
 from uuid import UUID
 from sqlalchemy import and_, select, update
 
