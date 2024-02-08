@@ -8,9 +8,10 @@ class Discount(Base):
 
     id = Column(Integer, primary_key=True)
     product_id = Column(Integer, ForeignKey('products.id'))
-    product = relationship('Product')
     discount_percentage = Column(Integer, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
+
+    product = relationship('Product')
 
 
