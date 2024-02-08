@@ -1,5 +1,5 @@
 from .base import Base
-from .shop_category_association import ShopCategoryAssociation
+from .shop_category_association import shop_category_association
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship
 
@@ -8,6 +8,7 @@ class Category(Base):
     __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255))
 
-    shops = relationship('Shop', secondary=ShopCategoryAssociation, back_populates="categories")
+    shops = relationship("Shop", secondary=shop_category_association, back_populates='categories')
+    product = relationship("Product", back_populates='category')

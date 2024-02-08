@@ -1,5 +1,5 @@
 from .base import Base
-from .shop_category_association import ShopCategoryAssociation
+from .shop_category_association import shop_category_association
 from sqlalchemy import Column, Boolean, String, Integer, DateTime, func, Text, Float
 from sqlalchemy.orm import relationship
 
@@ -15,4 +15,4 @@ class Shop(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.current_timestamp())
 
-    categories = relationship('Category', secondary=ShopCategoryAssociation, back_populates="shops")
+    categories = relationship('Category', secondary=shop_category_association, back_populates="shops")

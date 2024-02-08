@@ -1,10 +1,9 @@
 from .base import Base
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, Table
 
-
-class ShopCategoryAssociation(Base):
-    __tablename__ = 'shop_category_association'
-
-    id = Column(Integer, primary_key=True)
-    shop_id = Column(Integer, ForeignKey('shops.id'))
-    category_id = Column(Integer, ForeignKey('categories.id'))
+shop_category_association = Table(
+    'shop_category_association', Base.metadata,
+    Column('id', Integer, primary_key=True),
+    Column('shop_id', ForeignKey('shops.id'), nullable=False),
+    Column('category_id', ForeignKey('categories.id'), nullable=False)
+)
