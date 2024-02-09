@@ -1,3 +1,5 @@
+from sqlalchemy.orm import relationship
+
 from .base import Base
 from sqlalchemy import Column, Boolean, String, Integer, DateTime, Date, func
 
@@ -13,3 +15,6 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.current_timestamp())
     updated_at = Column(DateTime, default=func.current_timestamp())
+
+    bank_accounts = relationship('BankAccount')
+    orders = relationship('Order')
