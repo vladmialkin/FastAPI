@@ -10,7 +10,9 @@ class Order(Base):
     customer_id = Column(Integer, ForeignKey('users.id'))
     total_amount = Column(Float, nullable=False)
     created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
-    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
-    closed_at = Column(DateTime)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp(),
+                        nullable=False)
+    closed_at = Column(DateTime, onupdate=func.current_timestamp(), nullable=True)
 
+    products_on_order = relationship("ProductsOnOrder", back_populates='order')
     customer = relationship("User", back_populates='orders')

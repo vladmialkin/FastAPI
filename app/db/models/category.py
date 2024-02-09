@@ -8,8 +8,7 @@ class Category(Base):
     __tablename__ = 'categories'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255))
+    name = Column(String)
 
-    products = relationship("Product", back_populates='category')
     shops = relationship("Shop", secondary=shop_category_association, back_populates='categories')
-
+    products = relationship("Product", back_populates='category')

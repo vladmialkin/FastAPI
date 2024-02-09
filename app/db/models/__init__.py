@@ -7,3 +7,4 @@ from .shops import Shop
 from .shop_category_association import shop_category_association
 from .bank_accounts import BankAccount
 from .orders import Order
+from .products_on_order import ProductsOnOrder
