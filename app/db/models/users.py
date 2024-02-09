@@ -12,8 +12,8 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     date_of_birth = Column(Date, nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=func.current_timestamp())
-    updated_at = Column(DateTime, default=func.current_timestamp())
+    created_at = Column(DateTime, server_default=func.current_timestamp(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
 
     bank_accounts = relationship('BankAccount')
     orders = relationship('Order')

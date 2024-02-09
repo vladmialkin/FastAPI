@@ -10,8 +10,6 @@ class Product(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text)
     price = Column(Numeric(precision=10, scale=2), nullable=False)
-    category_id = Column(Integer, ForeignKey('categories.id'))
+    category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
 
     category = relationship("Category", back_populates='products')
-
-
