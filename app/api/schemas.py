@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union, Optional
 
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr
@@ -59,3 +59,42 @@ class InfoBankAccount(BaseModel):
 
 class BankAccountRequest(TunedModel):
     accounts: List[CreateBankAccount]
+
+
+class CreateProduct(BaseModel):
+    name: str
+    description: Optional[str]
+    price: float
+    category_id: int
+
+
+class ShowProduct(BaseModel):
+    name: str
+    description: Optional[str]
+    price: float
+    category_id: int
+
+
+class ShowProductOnOrder(BaseModel):
+    product_id: int
+
+
+class CreateOrder(BaseModel):
+    customer_id: int
+    total_amount: float
+    products: List[ShowProductOnOrder]
+
+
+class ShowOrder(BaseModel):
+    id: int
+    customer_id: int
+    total_amount: float
+    created_at: datetime
+    updated_at: datetime
+    closed_at: Optional[datetime]
+    products: List[ShowProduct]
+
+
+class ShowCategory(BaseModel):
+    id: int
+    name: str

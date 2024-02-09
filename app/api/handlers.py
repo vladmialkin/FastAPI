@@ -2,13 +2,17 @@ from fastapi.routing import APIRouter
 from fastapi import Depends, HTTPException
 from sqlalchemy import select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import exc
 
-from app.db.models import BankAccount, User
+from app.db.models import BankAccount, User, Order, Product, Category, ProductsOnOrder
 from app.db.session import get_db
-from .schemas import CreateUser, ShowUser, InfoBankAccount, BankAccountRequest, CreateBankAccount, ShowBankAccount
-
+from .schemas import CreateUser, ShowUser, InfoBankAccount, BankAccountRequest, CreateBankAccount, ShowBankAccount, \
+    CreateOrder, ShowOrder, CreateProduct, ShowProduct, ShowCategory
 user_router = APIRouter()  # создание router для User
 bank_account_router = APIRouter()
+order_router = APIRouter()
+product_router = APIRouter()
+category_router = APIRouter()
 
 
 async def _create_new_user(body: CreateUser, db: AsyncSession) -> ShowUser:
@@ -66,7 +70,7 @@ async def _transaction_bank_account(body: BankAccountRequest, db: AsyncSession) 
             for account in body.accounts:
                 create_new_account = BankAccount(user_id=account.user_id, balance=account.balance)
                 db.add(create_new_account)
-            await db.flush()
+
             #  Вывод всех аккаунтов
             query = select(BankAccount)
             res = await db.execute(query)
@@ -91,11 +95,77 @@ async def _transaction_bank_account(body: BankAccountRequest, db: AsyncSession) 
             last_accounts = [
                 ShowBankAccount(account_id=value[0].id, user_id=value[0].user_id, balance=value[0].balance) for
                 value in res.fetchall()]
+
+            await db.flush()
             return InfoBankAccount(accounts=accounts, update_account=update_account, updated_account=updated_account,
                                    delete_account=delete_account,
                                    last_accounts=last_accounts)
-    except Exception as error:
-        print(error)
+    except exc.IntegrityError:
+        raise HTTPException(status_code=422, detail='Один из пользователей уже имеет банковский счёт.')
+
+
+async def _create_order(body: CreateOrder, db: AsyncSession) -> ShowOrder:
+    try:
+        async with db.begin():
+            new_order = Order(customer_id=body.customer_id,
+                              total_amount=body.total_amount)
+            db.add(new_order)
+
+            await db.flush()
+            products = []
+            for product in body.products:
+                print(product.product_id)
+                product_on_order = ProductsOnOrder(order_id=new_order.id, product_id=product.product_id)
+                query = select(Product).where(Product.id == product.product_id)
+                res = await db.execute(query)
+                product = res.fetchone()[0]
+                products.append(ShowProduct(name=product.name,
+                                            description=product.description,
+                                            price=product.price,
+                                            category_id=product.category_id))
+                db.add(product_on_order)
+                await db.flush()
+            return ShowOrder(id=new_order.id,
+                             customer_id=new_order.customer_id,
+                             total_amount=new_order.total_amount,
+                             created_at=new_order.created_at,
+                             updated_at=new_order.updated_at,
+                             closed_at=new_order.closed_at,
+                             products=products
+                             )
+    except Exception as e:
+        print(e)
+
+
+async def _create_product(body: CreateProduct, db: AsyncSession) -> ShowProduct:
+    try:
+        async with db.begin():
+            new_product = Product(name=body.name,
+                                  description=body.description,
+                                  price=body.price,
+                                  category_id=body.category_id
+                                  )
+            db.add(new_product)
+            await db.flush()
+            return ShowProduct(name=new_product.name,
+                               description=new_product.description,
+                               price=new_product.price,
+                               category_id=new_product.category_id
+                               )
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+async def _create_category(name: str, db: AsyncSession) -> ShowCategory:
+    try:
+        async with db.begin():
+            new_category = Category(name=name)
+            db.add(new_category)
+            await db.flush()
+            return ShowCategory(id=new_category.id, name=new_category.name)
+    except Exception as e:
+        print(e)
 
 
 @user_router.post('/', response_model=CreateUser)
@@ -111,3 +181,18 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)) -> ShowUser
 @bank_account_router.post('/', response_model=InfoBankAccount)
 async def transaction_bank_account(body: BankAccountRequest, db: AsyncSession = Depends(get_db)) -> InfoBankAccount:
     return await _transaction_bank_account(body, db)
+
+
+@order_router.post('/', response_model=ShowOrder)
+async def create_order(body: CreateOrder, db: AsyncSession = Depends(get_db)) -> ShowOrder:
+    return await _create_order(body, db)
+
+
+@product_router.post('/', response_model=ShowProduct)
+async def create_product(body: CreateProduct, db: AsyncSession = Depends(get_db)) -> ShowProduct:
+    return await _create_product(body, db)
+
+
+@category_router.post('/', response_model=ShowCategory)
+async def create_category(name: str, db: AsyncSession = Depends(get_db)) -> ShowCategory:
+    return await _create_category(name, db)
