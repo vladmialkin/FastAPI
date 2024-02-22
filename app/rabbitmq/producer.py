@@ -37,16 +37,21 @@ class ShowOrder(BaseModel):
 
 
 async def _get_orders(db: AsyncSession):
-    try:
-        query = select(Order)
-        res = await db.execute(query)
-        return res.fetchall()
+    query = select(Order)
+    res = await db.execute(query)
+    orders = []
+    for val in res.fetchall():
+        val = val[0]
+        orders.append(ShowOrder(id=val.id, customer_id=val.customer_id, total_amount=val.total_amount,
+                                created_at=val.created_at, updated_at=val.updated_at, closed_at=val.closed_at,
+                                products=[ShowProduct(name=value.name,
+                                                      description=value.description,
+                                                      price=value.price,
+                                                      category_id=value.category_id) for value in val.products]))
+    return orders
 
-    except Exception as e:
-        print(e)
 
-
-def send_order_to_queue(order: CreateOrder):
+async def send_order_to_queue(order: CreateOrder):
     # Преобразование объекта CreateOrder в словарь
     order_dict = {
         'customer_id': order.customer_id,
@@ -57,13 +62,13 @@ def send_order_to_queue(order: CreateOrder):
     # Отправка заказа в очередь RabbitMQ
     channel.basic_publish(exchange='', routing_key='new_orders_queue', body=json.dumps(order_dict))
 
-@rabbitmq_router.post('/', response_model=CreateOrder)
-async def create_order(body: CreateOrder):
-    send_order_to_queue(body)
 
+@rabbitmq_router.post('/')
+async def create_order(body: CreateOrder):
+    await send_order_to_queue(body)
     return {"message": "Заказ создан"}
 
 
 @rabbitmq_router.get('/')
-async def create_order(db: AsyncSession = Depends(get_db)):
+async def get_order(db: AsyncSession = Depends(get_db)):
     return await _get_orders(db)
