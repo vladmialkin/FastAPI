@@ -8,6 +8,7 @@ from app.db.models import BankAccount, User, Order, Product, Category, ProductsO
 from app.db.session import get_db
 from .schemas import CreateUser, ShowUser, InfoBankAccount, BankAccountRequest, CreateBankAccount, ShowBankAccount, \
     CreateOrder, ShowOrder, CreateProduct, ShowProduct, ShowCategory
+
 user_router = APIRouter()  # создание router для User
 bank_account_router = APIRouter()
 order_router = APIRouter()
@@ -157,6 +158,22 @@ async def _create_product(body: CreateProduct, db: AsyncSession) -> ShowProduct:
         raise HTTPException(status_code=422, detail=str(e))
 
 
+async def _show_products(db: AsyncSession):
+    try:
+        async with db.begin():
+            query = select(Product)
+            res = await db.execute(query)
+            products = []
+            for val in res.fetchall():
+                val = val[0]
+                products.append(ShowProduct(name=val.name, description=val.description, price=val.price,
+                                            category_id=val.category_id))
+            return products
+
+    except Exception as e:
+        print(e)
+
+
 async def _create_category(name: str, db: AsyncSession) -> ShowCategory:
     try:
         async with db.begin():
@@ -164,6 +181,20 @@ async def _create_category(name: str, db: AsyncSession) -> ShowCategory:
             db.add(new_category)
             await db.flush()
             return ShowCategory(id=new_category.id, name=new_category.name)
+    except Exception as e:
+        print(e)
+
+
+async def _show_categories(db: AsyncSession):
+    try:
+        async with db.begin():
+            query = select(Category)
+            res = await db.execute(query)
+            categories = []
+            for val in res.fetchall():
+                val = val[0]
+                categories.append(ShowCategory(id=val.id, name=val.name))
+            return categories
     except Exception as e:
         print(e)
 
@@ -193,6 +224,16 @@ async def create_product(body: CreateProduct, db: AsyncSession = Depends(get_db)
     return await _create_product(body, db)
 
 
+@product_router.get('/')
+async def show_products(db: AsyncSession = Depends(get_db)):
+    return await _show_products(db)
+
+
 @category_router.post('/', response_model=ShowCategory)
 async def create_category(name: str, db: AsyncSession = Depends(get_db)) -> ShowCategory:
     return await _create_category(name, db)
+
+
+@category_router.get('/')
+async def show_categories(db: AsyncSession = Depends(get_db)):
+    return await _show_categories(db)
