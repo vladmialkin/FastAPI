@@ -2,7 +2,7 @@ import pika
 
 
 connect_params = pika.ConnectionParameters(
-    host='192.168.0.17',
+    host='localhost',
     port=5672,
     virtual_host='/',
     credentials=pika.PlainCredentials(

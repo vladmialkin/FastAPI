@@ -11,3 +11,14 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+  db:
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: fast_api
+      POSTGRES_PASSWORD: pgpwd4habr
+      POSTGRES_DB: fast_api
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
