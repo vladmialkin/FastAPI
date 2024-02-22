@@ -46,9 +46,21 @@ async def _get_orders(db: AsyncSession):
         print(e)
 
 
+def send_order_to_queue(order: CreateOrder):
+    # Преобразование объекта CreateOrder в словарь
+    order_dict = {
+        'customer_id': order.customer_id,
+        'total_amount': order.total_amount,
+        'products': [{'product_id': val.product_id} for val in order.products]
+    }
+
+    # Отправка заказа в очередь RabbitMQ
+    channel.basic_publish(exchange='', routing_key='new_orders_queue', body=json.dumps(order_dict))
+
 @rabbitmq_router.post('/', response_model=CreateOrder)
 async def create_order(body: CreateOrder):
-    channel.basic_publish(exchange='', routing_key='new_orders_queue', body=json.dumps(body))
+    send_order_to_queue(body)
+
     return {"message": "Заказ создан"}
 
 
