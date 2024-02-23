@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 from api.handlers import user_router, bank_account_router, product_router, category_router
-from app.rabbitmq.producer import rabbitmq_router
+from rabbitmq.producer import rabbitmq_router
 
 #  Создание экземпляра приложения
 

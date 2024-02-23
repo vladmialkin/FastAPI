@@ -4,8 +4,8 @@ from sqlalchemy import select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import exc
 
-from app.db.models import BankAccount, User, Order, Product, Category, ProductsOnOrder
-from app.db.session import get_db
+from ..db.models import BankAccount, User, Order, Product, Category, ProductsOnOrder
+from ..db.session import get_db
 from .schemas import CreateUser, ShowUser, InfoBankAccount, BankAccountRequest, CreateBankAccount, ShowBankAccount, \
     CreateOrder, ShowOrder, CreateProduct, ShowProduct, ShowCategory
 
