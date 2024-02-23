@@ -10,7 +10,7 @@ from .connecting import channel, connection
 from pydantic import BaseModel
 from app.api.schemas import ShowProductOnOrder, ShowProduct
 from app.db.models import Order
-from ..db.session import get_db
+from app.db.session import get_db
 
 rabbitmq_router = APIRouter()
 
