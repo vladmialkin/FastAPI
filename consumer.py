@@ -1,3 +1,5 @@
+import json
+
 from app.rabbitmq.connecting import channel, connection
 
 try:
@@ -7,6 +9,8 @@ try:
         if method_frame:
             print("Сообщение прочитано", body)
             # Добавьте вашу логику обработки сообщения здесь
+            message = 'Пользватель, ваше сообщение отправлено'
+            channel.basic_publish(exchange='', routing_key='sending_message_queue', body=message)
             print("Пользователь, ваше сообщение доставлено!")
         else:
             # Если очередь пуста, выход из цикла

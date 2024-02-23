@@ -11,7 +11,21 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-  db:
+    networks:
+      - custom
+
+  app:
+    container_name: "app"
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+
+  postgre_db:
     restart: always
     image: postgres
     environment:
@@ -22,3 +36,8 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - 5433:5432
+    networks:
+      - custom
+networks:
+  custom:
+    driver: bridge
