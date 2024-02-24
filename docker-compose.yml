@@ -14,8 +14,6 @@ services:
     networks:
       - custom
 
-  
-
   postgre_db:
     restart: always
     image: postgres
@@ -29,6 +27,19 @@ services:
       - 5433:5432
     networks:
       - custom
+
+  test_postgre_db:
+    restart: always
+    image: postgres
+    environment:
+      POSTGRES_USER: fast_api
+      POSTGRES_PASSWORD: pgpwd4habr
+      POSTGRES_DB: test_fast_api
+    ports:
+      - 5434:5432
+    networks:
+      - custom
+
   app:
     container_name: "app"
     image: app
@@ -39,7 +50,7 @@ services:
       - "8000:8000"
     networks:
       - custom
-        
+
 networks:
   custom:
     driver: bridge
