@@ -1,27 +1,25 @@
-from sqlalchemy import select, insert
+from httpx import AsyncClient
+import pytest
 
-from conftest import client, async_session_test
-from app.db.models import User
-
-
-def test_create_user():
-    client.post("/user/", json=
-    {
-        "first_name": "string",
-        "last_name": "string",
-        "email": "user@example.com",
-        "date_of_birth": "2024-02-24"
-
-    })
+from main import my_app
 
 
-async def test_get_users():
-    async with async_session_test() as session:
-        query = insert(User).values(first_name='vlad', last_name="mialkin", email="vladmialkin@example.com",
-                                    date_of_birth="2000-02-24")
-        await session.execute(query)
-        await session.commit()
+@pytest.mark.anyio
+async def test_user():
+    async with AsyncClient(app=my_app, base_url="http://test") as ac:
+        response = await ac.get("/user")
+    assert response.status_code == 307
 
-        query = select(User)
-        result = await session.execute(query)
-        print(result.all())
+
+@pytest.mark.anyio
+async def test_create_user():
+    async with AsyncClient(app=my_app, base_url="http://test") as ac:
+        response = ac.post(
+            "/user/",
+            json={
+                "first_name": "vlad",
+                "last_name": "mialkin",
+                "email": "mialkin@example.com",
+                "date_of_birth": "2000-02-25"
+            }
+        )

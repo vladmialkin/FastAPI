@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import exc
 
 from app.db.models import BankAccount, User, Order, Product, Category, ProductsOnOrder
-from app.db.session import get_db
+from app.db.session import get_db, get_async_session
 from .schemas import CreateUser, ShowUser, InfoBankAccount, BankAccountRequest, CreateBankAccount, ShowBankAccount, \
     CreateOrder, ShowOrder, CreateProduct, ShowProduct, ShowCategory
 
@@ -200,40 +200,40 @@ async def _show_categories(db: AsyncSession):
 
 
 @user_router.post('/', response_model=CreateUser)
-async def create_user(body: CreateUser, db: AsyncSession = Depends(get_db)) -> ShowUser:
+async def create_user(body: CreateUser, db: AsyncSession = Depends(get_async_session)) -> ShowUser:
     return await _create_new_user(body, db)
 
 
 @user_router.get('/', response_model=ShowUser)
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)) -> ShowUser:
+async def get_user(user_id: int, db: AsyncSession = Depends(get_async_session)) -> ShowUser:
     return await _get_user(user_id, db)
 
 
 @bank_account_router.post('/', response_model=InfoBankAccount)
-async def transaction_bank_account(body: BankAccountRequest, db: AsyncSession = Depends(get_db)) -> InfoBankAccount:
+async def transaction_bank_account(body: BankAccountRequest, db: AsyncSession = Depends(get_async_session)) -> InfoBankAccount:
     return await _transaction_bank_account(body, db)
 
 
 @order_router.post('/', response_model=ShowOrder)
-async def create_order(body: CreateOrder, db: AsyncSession = Depends(get_db)) -> ShowOrder:
+async def create_order(body: CreateOrder, db: AsyncSession = Depends(get_async_session)) -> ShowOrder:
     return await _create_order(body, db)
 
 
 @product_router.post('/', response_model=ShowProduct)
-async def create_product(body: CreateProduct, db: AsyncSession = Depends(get_db)) -> ShowProduct:
+async def create_product(body: CreateProduct, db: AsyncSession = Depends(get_async_session)) -> ShowProduct:
     return await _create_product(body, db)
 
 
 @product_router.get('/')
-async def show_products(db: AsyncSession = Depends(get_db)):
+async def show_products(db: AsyncSession = Depends(get_async_session)):
     return await _show_products(db)
 
 
 @category_router.post('/', response_model=ShowCategory)
-async def create_category(name: str, db: AsyncSession = Depends(get_db)) -> ShowCategory:
+async def create_category(name: str, db: AsyncSession = Depends(get_async_session)) -> ShowCategory:
     return await _create_category(name, db)
 
 
 @category_router.get('/')
-async def show_categories(db: AsyncSession = Depends(get_db)):
+async def show_categories(db: AsyncSession = Depends(get_async_session)):
     return await _show_categories(db)

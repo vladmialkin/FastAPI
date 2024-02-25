@@ -2,7 +2,7 @@ import pika
 
 
 connect_params = pika.ConnectionParameters(
-    host='localhost',
+    host='rabbitmq',
     port=5672,
     virtual_host='/',
     credentials=pika.PlainCredentials(

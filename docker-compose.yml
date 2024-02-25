@@ -17,6 +17,7 @@ services:
   postgre_db:
     restart: always
     image: postgres
+    hostname: postgre_db
     environment:
       POSTGRES_USER: fast_api
       POSTGRES_PASSWORD: pgpwd4habr
@@ -31,6 +32,7 @@ services:
   test_postgre_db:
     restart: always
     image: postgres
+    hostname: test_postgre_db
     environment:
       POSTGRES_USER: fast_api
       POSTGRES_PASSWORD: pgpwd4habr

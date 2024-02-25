@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from app.settings import TEST_DATABASE_URL
 from app.db.models.base import Base
 from app.main import my_app
-from app.db.session import get_db
+from app.db.session import get_async_session
 from httpx import AsyncClient
 
 # Подключение к БД
@@ -25,7 +25,7 @@ async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-my_app.dependency_overrides[get_db] = override_get_async_session
+my_app.dependency_overrides[get_async_session] = override_get_async_session
 
 
 @pytest.fixture(autouse=True, scope='session')
