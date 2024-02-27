@@ -4,7 +4,10 @@ services:
   rabbitmq:
     image: "rabbitmq:3-management"
     hostname: rabbitmq
+    container_name: "rabbitmq"
     restart: always
+    depends_on:
+      - postgre_db
     environment:
       RABBITMQ_DEFAULT_USER: "fast_api_user"
       RABBITMQ_DEFAULT_PASS: "fast_api_pass"
@@ -18,6 +21,7 @@ services:
     restart: always
     image: postgres
     hostname: postgre_db
+    container_name: "postgre_db"
     environment:
       POSTGRES_USER: fast_api
       POSTGRES_PASSWORD: pgpwd4habr
@@ -25,7 +29,7 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
-      - 5433:5432
+      - 5433:5433
     networks:
       - custom
 
@@ -33,12 +37,13 @@ services:
     restart: always
     image: postgres
     hostname: test_postgre_db
+    container_name: "test_postgre_db"
     environment:
       POSTGRES_USER: fast_api
       POSTGRES_PASSWORD: pgpwd4habr
       POSTGRES_DB: test_fast_api
     ports:
-      - 5434:5432
+      - 5434:5434
     networks:
       - custom
 
@@ -48,6 +53,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - postgre_db
+      - test_postgre_db
+      - rabbitmq
     ports:
       - "8000:8000"
     networks:
