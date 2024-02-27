@@ -29,7 +29,7 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5434:5434"
     networks:
       - custom
 
@@ -43,7 +43,7 @@ services:
       POSTGRES_PASSWORD: pgpwd4habr
       POSTGRES_DB: test_fast_api
     ports:
-      - "5432:5434"
+      - "5433:5432"
     networks:
       - custom
 
