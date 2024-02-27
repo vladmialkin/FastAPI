@@ -4,5 +4,4 @@ WORKDIR .
 RUN python3 -m pip install -r requirements.txt
 EXPOSE 8000
 COPY ./app .
-CMD [ "alembic", "revision", "--autogenerate", ";", "alembic", "upgrade", "head"]
 CMD ["uvicorn", "app.main:my_app", "--host", "0.0.0.0", "--port", "8000"]
