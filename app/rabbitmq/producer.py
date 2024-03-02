@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .connecting import channel, connection
+from connecting import channel, connection
 from pydantic import BaseModel
 from app.api.schemas import ShowProductOnOrder, ShowProduct
 from app.db.models import Order

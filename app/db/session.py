@@ -19,13 +19,14 @@ logger2.addHandler(handler2)
 
 logger2.info(f"Connecting DataBase")
 # Подключение к БД
-
 engine = create_async_engine(REAL_DATABASE_URL, future=True, echo=True)
-
 async_session_maker = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
 async def get_db() -> Generator:
+    """
+    Функция подключения к сессии дб
+    """
     try:
         session: AsyncSession = async_session_maker()
         yield session
@@ -34,6 +35,9 @@ async def get_db() -> Generator:
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Функция подключения к сессии дб
+    """
     async with async_session_maker() as session:
         logger2.info(f"Db connected")
         yield session

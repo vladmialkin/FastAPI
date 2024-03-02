@@ -21,7 +21,7 @@ py_logger.addHandler(py_handler)
 my_app = FastAPI(title="Мой проект")
 
 main_api_router = APIRouter()
-
+# подключение всех роутов к главному
 main_api_router.include_router(user_router, prefix='/user', tags=['user'])
 main_api_router.include_router(bank_account_router, prefix='/bank_account', tags=['bank_account'])
 # main_api_router.include_router(rabbitmq_router, prefix='/order', tags=['order'])
@@ -30,5 +30,6 @@ main_api_router.include_router(category_router, prefix='/category', tags=['categ
 my_app.include_router(main_api_router)
 
 if __name__ == '__main__':
+    # запуск сервера
     py_logger.info("Start app")
     uvicorn.run("main:my_app", host='127.0.0.2', port=8000, reload=True)

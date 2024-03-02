@@ -17,13 +17,20 @@ category_router = APIRouter()
 
 
 async def _create_new_user(body: CreateUser, db: AsyncSession) -> ShowUser:
+    """
+    Функиция создает нового пользлвателя и возвращает его.
+    body: данные пользователя
+    db: сессия дб
+    """
     try:
         async with db.begin():
             new_user = User(first_name=body.first_name,
                             last_name=body.last_name,
                             email=body.email,
                             date_of_birth=body.date_of_birth)
+            # добавить пользователя в бд
             db.add(new_user)
+            # подтвердить добавление
             await db.flush()
             return ShowUser(
                 user_id=new_user.id,
@@ -41,12 +48,19 @@ async def _create_new_user(body: CreateUser, db: AsyncSession) -> ShowUser:
 
 
 async def _get_user(user_id: int, db: AsyncSession) -> ShowUser:
+    """
+    Функция ищет пользователя по его id.
+    """
     try:
         async with db.begin():
+            # запрос на получение пользователя
             query = select(User).where(User.id == user_id)
+            # выполнение запроса в бд
             res = await db.execute(query)
+            # получение результата
             user_row = res.fetchone()
             if user_row is not None:
+                # вывод данных, если результат запроса не пустой
                 user = user_row[0]
                 return ShowUser(
                     user_id=user.id,
@@ -59,12 +73,16 @@ async def _get_user(user_id: int, db: AsyncSession) -> ShowUser:
                     updated_at=user.updated_at
                 )
             else:
+                # вывод ошибки, если пользователя с введенным id не существует
                 raise HTTPException(status_code=404, detail=f"Пользователя с id {user_id} не существует.")
     except Exception as error:
         raise HTTPException(status_code=404, detail=str(error))
 
 
 async def _transaction_bank_account(body: BankAccountRequest, db: AsyncSession) -> InfoBankAccount:
+    """
+    Функция работы с банковскими аккаунтами
+    """
     try:
         async with db.begin():
             #  Создание 2 аккаунтов
@@ -96,26 +114,32 @@ async def _transaction_bank_account(body: BankAccountRequest, db: AsyncSession) 
             last_accounts = [
                 ShowBankAccount(account_id=value[0].id, user_id=value[0].user_id, balance=value[0].balance) for
                 value in res.fetchall()]
-
+            # подтверждение действий в бд
             await db.flush()
             return InfoBankAccount(accounts=accounts, update_account=update_account, updated_account=updated_account,
                                    delete_account=delete_account,
                                    last_accounts=last_accounts)
     except exc.IntegrityError:
+        # ошибка при создании аккаунта пользователю, у которого уже существует аккаунт
         raise HTTPException(status_code=422, detail='Один из пользователей уже имеет банковский счёт.')
 
 
 async def _create_order(body: CreateOrder, db: AsyncSession) -> ShowOrder:
+    """
+    Функция создания заказа
+    """
+
     try:
         async with db.begin():
+            # создание заказа
             new_order = Order(customer_id=body.customer_id,
                               total_amount=body.total_amount)
             db.add(new_order)
 
             await db.flush()
             products = []
+            # получение данных по каждому продукту, созданного заказа
             for product in body.products:
-                print(product.product_id)
                 product_on_order = ProductsOnOrder(order_id=new_order.id, product_id=product.product_id)
                 query = select(Product).where(Product.id == product.product_id)
                 res = await db.execute(query)
@@ -135,10 +159,14 @@ async def _create_order(body: CreateOrder, db: AsyncSession) -> ShowOrder:
                              products=products
                              )
     except Exception as e:
+        # вывод ошибок
         print(e)
 
 
 async def _create_product(body: CreateProduct, db: AsyncSession) -> ShowProduct:
+    """
+    Функция создания продукта
+    """
     try:
         async with db.begin():
             new_product = Product(name=body.name,
@@ -159,6 +187,10 @@ async def _create_product(body: CreateProduct, db: AsyncSession) -> ShowProduct:
 
 
 async def _show_products(db: AsyncSession):
+    """
+    Функция получения всех продуктов
+    """
+
     try:
         async with db.begin():
             query = select(Product)
@@ -175,6 +207,9 @@ async def _show_products(db: AsyncSession):
 
 
 async def _create_category(name: str, db: AsyncSession) -> ShowCategory:
+    """
+    Функция создания категории
+    """
     try:
         async with db.begin():
             new_category = Category(name=name)
@@ -186,6 +221,9 @@ async def _create_category(name: str, db: AsyncSession) -> ShowCategory:
 
 
 async def _show_categories(db: AsyncSession):
+    """
+    Функция просмотра всех категорий
+    """
     try:
         async with db.begin():
             query = select(Category)
@@ -210,7 +248,8 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_async_session)) 
 
 
 @bank_account_router.post('/', response_model=InfoBankAccount)
-async def transaction_bank_account(body: BankAccountRequest, db: AsyncSession = Depends(get_async_session)) -> InfoBankAccount:
+async def transaction_bank_account(body: BankAccountRequest,
+                                   db: AsyncSession = Depends(get_async_session)) -> InfoBankAccount:
     return await _transaction_bank_account(body, db)
 
 
